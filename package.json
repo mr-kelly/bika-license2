@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bika.ai License",
   "main": "index.js",
-  "repository": "git@github.com:napi-rs/package-template.git",
+  "repository": "https://github.com/mr-kelly/bika-license2",
   "license": "MIT",
   "keywords": [
     "napi-rs",
