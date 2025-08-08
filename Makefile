@@ -1,5 +1,5 @@
 dev:
-	cd license-server && npx wrangler dev
+	cd license-server && npx wrangler dev --remote
 
 test: test-rlib test-server test-nodelib
 	@echo 'All tests passed'
