@@ -64,15 +64,15 @@ test('function parameter type validation', (t) => {
   }, { message: /Failed to convert JavaScript value `Undefined` into rust type `String`/ });
   
   t.throws(() => {
-    decrypt(123);
+    decrypt(123 as any);
   }, { message: /Failed to convert JavaScript value `Number 123 ` into rust type `String`/ });
   
   t.throws(() => {
-    decrypt({});
+    decrypt({} as any);
   }, { message: /Failed to convert JavaScript value `Object {}` into rust type `String`/ });
   
   t.throws(() => {
-    decrypt([]);
+    decrypt([] as any);
   }, { message: /Failed to convert JavaScript value `Object \[\]` into rust type `String`/ });
 })
 
@@ -256,7 +256,7 @@ test('input validation stress test', (t) => {
   testCases.forEach(({ input, expectedError }, index) => {
     try {
       t.throws(() => {
-        decrypt(input);
+        decrypt(input as any);
       }, { message: expectedError }, `Test case ${index}: ${input}`);
     } catch (e) {
       // 某些情况下可能在更早的阶段失败（比如null/undefined）
