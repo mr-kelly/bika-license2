@@ -18,6 +18,9 @@ build:
 
 lint:
 	yarn run lint
+	cargo fmt
+	cd license-server && cargo fmt
+	cd license-lib && cargo fmt
 
 install:
 	yarn

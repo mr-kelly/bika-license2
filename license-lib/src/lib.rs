@@ -4,128 +4,127 @@ use rsa::{Pkcs1v15Encrypt, RsaPrivateKey};
 use rsa::pkcs8::DecodePrivateKey;
 
 pub fn add(left: usize, right: usize) -> usize {
-    left + right
+  left + right
 }
 
 pub fn decrypt(base64_message: &str) -> Result<String, String> {
-    // Check input length and validity
-    if base64_message.is_empty() {
-        return Err("Input cannot be empty".to_string());
-    }
-    
-    // Check if this is chunked format (starts with "CHUNK:")
-    if base64_message.starts_with("CHUNK:") {
-        return decrypt_chunked(base64_message);
-    }
-    
-    // Original format - single RSA block
-    decrypt_single_block(base64_message)
+  // Check input length and validity
+  if base64_message.is_empty() {
+    return Err("Input cannot be empty".to_string());
+  }
+
+  // Check if this is chunked format (starts with "CHUNK:")
+  if base64_message.starts_with("CHUNK:") {
+    return decrypt_chunked(base64_message);
+  }
+
+  // Original format - single RSA block
+  decrypt_single_block(base64_message)
 }
 
 fn decrypt_single_block(base64_message: &str) -> Result<String, String> {
-    // Check if the base64 string is too long 
-    // RSA-2048 produces 256-byte ciphertext, which is 344 chars in base64
-    // We allow some extra margin for safety
-    if base64_message.len() > 400 {
-        return Err("Input too long".to_string());
-    }
+  // Check if the base64 string is too long
+  // RSA-2048 produces 256-byte ciphertext, which is 344 chars in base64
+  // We allow some extra margin for safety
+  if base64_message.len() > 400 {
+    return Err("Input too long".to_string());
+  }
 
-    // Decode base64
-    let encrypted_message = match BASE64_STANDARD.decode(base64_message) {
-        Ok(data) => data,
-        Err(_) => return Err("Invalid base64 encoding".to_string()),
-    };
+  // Decode base64
+  let encrypted_message = match BASE64_STANDARD.decode(base64_message) {
+    Ok(data) => data,
+    Err(_) => return Err("Invalid base64 encoding".to_string()),
+  };
 
-    // Check if the encrypted data has the right size for RSA-2048 (256 bytes)
-    if encrypted_message.len() != 256 {
-        return Err("Invalid encrypted data size".to_string());
-    }
+  // Check if the encrypted data has the right size for RSA-2048 (256 bytes)
+  if encrypted_message.len() != 256 {
+    return Err("Invalid encrypted data size".to_string());
+  }
 
-    let private_key = get_private_key();
-    let decrypted_message = match private_key.decrypt(Pkcs1v15Encrypt, &encrypted_message) {
-        Ok(data) => data,
-        Err(_) => return Err("Decryption failed".to_string()),
-    };
-    
-    match String::from_utf8(decrypted_message) {
-        Ok(text) => {
-            // Check if the decrypted text is too long (should be <= 245 for RSA-2048)
-            if text.len() > 245 {
-                return Err("Decrypted text too long".to_string());
-            }
-            Ok(text)
-        },
-        Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
+  let private_key = get_private_key();
+  let decrypted_message = match private_key.decrypt(Pkcs1v15Encrypt, &encrypted_message) {
+    Ok(data) => data,
+    Err(_) => return Err("Decryption failed".to_string()),
+  };
+
+  match String::from_utf8(decrypted_message) {
+    Ok(text) => {
+      // Check if the decrypted text is too long (should be <= 245 for RSA-2048)
+      if text.len() > 245 {
+        return Err("Decrypted text too long".to_string());
+      }
+      Ok(text)
     }
+    Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
+  }
 }
 
 fn decrypt_chunked(base64_message: &str) -> Result<String, String> {
-    // Parse format: "CHUNK:count:block1|block2|..."
-    let parts: Vec<&str> = base64_message.splitn(3, ':').collect();
-    if parts.len() != 3 {
-        return Err("Invalid chunked format".to_string());
-    }
-    
-    if parts[0] != "CHUNK" {
-        return Err("Invalid chunked prefix".to_string());
-    }
-    
-    let chunk_count: usize = match parts[1].parse() {
-        Ok(count) => count,
-        Err(_) => return Err("Invalid chunk count".to_string()),
-    };
-    
-    if chunk_count == 0 || chunk_count > 100 { // Reasonable limit
-        return Err("Invalid chunk count".to_string());
-    }
-    
-    let blocks: Vec<&str> = parts[2].split('|').collect();
-    if blocks.len() != chunk_count {
-        return Err("Chunk count mismatch".to_string());
-    }
-    
-    let mut decrypted_parts = Vec::new();
-    let private_key = get_private_key();
-    
-    for block in blocks {
-        // Decode this block
-        let encrypted_data = match BASE64_STANDARD.decode(block) {
-            Ok(data) => data,
-            Err(_) => return Err("Invalid base64 in chunk".to_string()),
-        };
-        
-        if encrypted_data.len() != 256 {
-            return Err("Invalid chunk size".to_string());
-        }
-        
-        // Decrypt this block
-        let decrypted_block = match private_key.decrypt(Pkcs1v15Encrypt, &encrypted_data) {
-            Ok(data) => data,
-            Err(_) => return Err("Failed to decrypt chunk".to_string()),
-        };
-        
-        decrypted_parts.push(decrypted_block);
-    }
-    
-    // Combine all decrypted parts
-    let combined: Vec<u8> = decrypted_parts.into_iter().flatten().collect();
-    
-    match String::from_utf8(combined) {
-        Ok(text) => Ok(text),
-        Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
-    }
-}
+  // Parse format: "CHUNK:count:block1|block2|..."
+  let parts: Vec<&str> = base64_message.splitn(3, ':').collect();
+  if parts.len() != 3 {
+    return Err("Invalid chunked format".to_string());
+  }
 
+  if parts[0] != "CHUNK" {
+    return Err("Invalid chunked prefix".to_string());
+  }
+
+  let chunk_count: usize = match parts[1].parse() {
+    Ok(count) => count,
+    Err(_) => return Err("Invalid chunk count".to_string()),
+  };
+
+  if chunk_count == 0 || chunk_count > 100 {
+    // Reasonable limit
+    return Err("Invalid chunk count".to_string());
+  }
+
+  let blocks: Vec<&str> = parts[2].split('|').collect();
+  if blocks.len() != chunk_count {
+    return Err("Chunk count mismatch".to_string());
+  }
+
+  let mut decrypted_parts = Vec::new();
+  let private_key = get_private_key();
+
+  for block in blocks {
+    // Decode this block
+    let encrypted_data = match BASE64_STANDARD.decode(block) {
+      Ok(data) => data,
+      Err(_) => return Err("Invalid base64 in chunk".to_string()),
+    };
+
+    if encrypted_data.len() != 256 {
+      return Err("Invalid chunk size".to_string());
+    }
+
+    // Decrypt this block
+    let decrypted_block = match private_key.decrypt(Pkcs1v15Encrypt, &encrypted_data) {
+      Ok(data) => data,
+      Err(_) => return Err("Failed to decrypt chunk".to_string()),
+    };
+
+    decrypted_parts.push(decrypted_block);
+  }
+
+  // Combine all decrypted parts
+  let combined: Vec<u8> = decrypted_parts.into_iter().flatten().collect();
+
+  match String::from_utf8(combined) {
+    Ok(text) => Ok(text),
+    Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
+  }
+}
 
 /**
  * 获取Private Key 结构体
  */
 pub fn get_private_key() -> RsaPrivateKey {
-    // 将私钥字符串解析为 private key
-    let private_key = RsaPrivateKey::from_pkcs8_pem(PRIVATE_KEY).unwrap();
-    return private_key;
+  // 将私钥字符串解析为 private key
+  let private_key = RsaPrivateKey::from_pkcs8_pem(PRIVATE_KEY).unwrap();
+  return private_key;
 }
-
 
 // 私钥在客户端，用于解密
 pub const PRIVATE_KEY: &str = r#"
@@ -158,4 +157,3 @@ XVFR8vz4ympM/SuOg7/oO41RQtvNCUvwT/dyfhLep7fwsoDGTz6yZIp83eqS9VQm
 I6lQDQAVMU3woJGSx67TePxa
 -----END PRIVATE KEY-----
 "#;
-

@@ -45,16 +45,14 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
   router
     .get_async("/test", |_req, _ctx| async move {
       match encrypt("Hello, World!") {
-        Ok(encrypted) => {
-          match decrypt(&encrypted) {
-            Ok(decrypted) => Response::ok(format!(
-              "Encrypted: {}, Decrypted: {}",
-              encrypted, decrypted
-            )),
-            Err(e) => Response::error(&format!("Decryption error: {}", e), 400)
-          }
+        Ok(encrypted) => match decrypt(&encrypted) {
+          Ok(decrypted) => Response::ok(format!(
+            "Encrypted: {}, Decrypted: {}",
+            encrypted, decrypted
+          )),
+          Err(e) => Response::error(&format!("Decryption error: {}", e), 400),
         },
-        Err(e) => Response::error(&format!("Encryption error: {}", e), 400)
+        Err(e) => Response::error(&format!("Encryption error: {}", e), 400),
       }
     })
     // 获取所有code
@@ -74,31 +72,27 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     })
     // 只负责加密字符串，解密函数在客户端rust lib
     .post_async("/:key/encrypt", |mut req, ctx| async move {
-        let key = ctx.param("key").unwrap();
-        if !check_access(key) {
-          return Response::error("Access Denied", 403);
-        }
-        let body = req.json::<EncryptRequest>().await?;
-        log!("Start encrypt, {}", body.s);
-        match encrypt(&body.s) {
-          Ok(encrypted) => {
-            Response::ok(encrypted)
-          },
-          Err(e) => {
-            Response::error(&format!("Encryption error: {}", e), 400)
-          }
-        }
-      })
+      let key = ctx.param("key").unwrap();
+      if !check_access(key) {
+        return Response::error("Access Denied", 403);
+      }
+      let body = req.json::<EncryptRequest>().await?;
+      log!("Start encrypt, {}", body.s);
+      match encrypt(&body.s) {
+        Ok(encrypted) => Response::ok(encrypted),
+        Err(e) => Response::error(&format!("Encryption error: {}", e), 400),
+      }
+    })
     // 新建一个code
     .post_async("/:key/license", |mut req, ctx| async move {
       let key = ctx.param("key").unwrap();
       if !check_access(key) {
-      return Response::error("Access Denied", 403);
+        return Response::error("Access Denied", 403);
       }
       let body = req.json::<LicenseCode>().await?;
       let d1 = ctx.env.d1("license-server")?;
       let statement = d1.prepare(format!(
-      "INSERT INTO LicenseCode (name, code, createdAt, activated) VALUES (?1, ?2, ?3, 0)"
+        "INSERT INTO LicenseCode (name, code, createdAt, activated) VALUES (?1, ?2, ?3, 0)"
       ));
       let query = statement.bind(&[body.name.into(), body.code.into(), body.createdAt.into()])?;
       query.run().await?;
@@ -108,18 +102,18 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     .patch_async("/:key/license", |mut req, ctx| async move {
       let key = ctx.param("key").unwrap();
       if !check_access(key) {
-      return Response::error("Access Denied", 403);
+        return Response::error("Access Denied", 403);
       }
       let body = req.json::<LicenseCode>().await?;
       let d1 = ctx.env.d1("license-server")?;
       let statement = d1.prepare(
-      "UPDATE LicenseCode SET code = ?1, activated = ?2, createdAt = ?3 WHERE name = ?4"
+        "UPDATE LicenseCode SET code = ?1, activated = ?2, createdAt = ?3 WHERE name = ?4",
       );
       let query = statement.bind(&[
-      body.code.into(), 
-      body.activated.into(), 
-      body.createdAt.into(), 
-      body.name.into(), 
+        body.code.into(),
+        body.activated.into(),
+        body.createdAt.into(),
+        body.name.into(),
       ])?;
       query.run().await?;
       Response::ok("Success")
@@ -138,9 +132,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
       let query = statement.bind(&[code.into()])?;
       let result = query.first::<LicenseCode>(None).await?;
       match result {
-        Some(thing) => {
-            Response::from_json(&thing)
-        },
+        Some(thing) => Response::from_json(&thing),
         None => Response::error("Not found", 404),
       }
     })
@@ -156,36 +148,36 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
       let query = statement.bind(&[name.into()])?;
       let result = query.first::<LicenseCode>(None).await?;
       match result {
-        Some(thing) => {
-            Response::from_json(&thing)
-        },
+        Some(thing) => Response::from_json(&thing),
         None => Response::error("Not found", 404),
       }
     })
     // 激活code的信息，通常是服务端激活使用，客户传输 LicenseCode 整个JSON进行匹配
     // 这个接口是public的，无需access key
     .post_async("/license/activate", |mut req, ctx| async move {
-        // 要求对方要完整构造上来
-        let body = req.json::<LicenseCode>().await?;
-        let name = body.name;
+      // 要求对方要完整构造上来
+      let body = req.json::<LicenseCode>().await?;
+      let name = body.name;
 
-        let d1 = ctx.env.d1("license-server")?;
-        let statement = d1.prepare("SELECT * FROM LicenseCode WHERE name = ?1 AND code = ?2");
-        let query = statement.bind(&[name.into(), body.code.into()])?;
-        let result = query.first::<LicenseCode>(None).await?;
+      let d1 = ctx.env.d1("license-server")?;
+      let statement = d1.prepare("SELECT * FROM LicenseCode WHERE name = ?1 AND code = ?2");
+      let query = statement.bind(&[name.into(), body.code.into()])?;
+      let result = query.first::<LicenseCode>(None).await?;
 
-        match result {
-          Some(thing) => {
-              // 找到了，校验 activated +1
-              let update_statement = d1.prepare("UPDATE LicenseCode SET activated = ?1 WHERE name = ?2");
-              let update_query = update_statement.bind(&[(thing.activated + 1).into(), (&thing.name).into()])?;
-              update_query.run().await?;
-  
-              Response::from_json(&thing)
-          },
-          None => Response::error("Not found", 404),
+      match result {
+        Some(thing) => {
+          // 找到了，校验 activated +1
+          let update_statement =
+            d1.prepare("UPDATE LicenseCode SET activated = ?1 WHERE name = ?2");
+          let update_query =
+            update_statement.bind(&[(thing.activated + 1).into(), (&thing.name).into()])?;
+          update_query.run().await?;
+
+          Response::from_json(&thing)
         }
-      })
+        None => Response::error("Not found", 404),
+      }
+    })
     // 删除一个code
     .delete_async("/:key/license/:id", |_, ctx| async move {
       let key = ctx.param("key").unwrap();
