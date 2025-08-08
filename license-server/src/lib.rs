@@ -15,6 +15,7 @@ mod tests;
 struct LicenseCode {
   name: String,
   code: String,
+  #[allow(non_snake_case)]
   createdAt: String,
   activated: u32,
   // expiredAt: Option<String>,
@@ -73,20 +74,15 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     .post_async("/:key/encrypt", |mut req, ctx| async move {
         console_log::init_with_level(log::Level::Info).expect("error initializing log");
         println!("Hi!");
-        info!("This is a log message!");
         let key = ctx.param("key").unwrap();
         println!("Key: {}", key);
         if !check_access(key) {
           return Response::error("Access Denied", 403);
         }
-        println!("Key2: {}", key);
-        info!("This is a log message!2");
         let body = req.json::<EncryptRequest>().await?;
-        info!("This is a log message!3");
-        println!("Key3: {}", key);
+        info!("Start encrypt, {}", body.s);
         match encrypt(&body.s) {
           Ok(encrypted) => {
-            info!("This is a log message!4");
             Response::ok(encrypted)
           },
           Err(e) => {

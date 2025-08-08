@@ -42,13 +42,10 @@ pub fn encrypt(message: &str) -> Result<String, String> {
         ));
     }
 
-    info!("This is a log message!7");
-    info!("This is a log message!8");
     let mut rng = OsRng;
     
     match public_key.encrypt(&mut rng, Pkcs1v15Encrypt, message.as_bytes()) {
         Ok(encrypted_message) => {
-            info!("This is a log message!9");
             Ok(BASE64_STANDARD.encode(encrypted_message))
         },
         Err(e) => {

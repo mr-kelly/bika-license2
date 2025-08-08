@@ -7,10 +7,10 @@ routes = [
 ]
 
 [build]
-command = "cargo install -q worker-build && worker-build --release"
+command = "cargo install -q worker-build && worker-build --release --no-opt"
 
 [env.dev]
-build = { command = "cargo install -q worker-build && worker-build --dev" }
+build = { command = "cargo install -q worker-build && worker-build --dev --no-opt" }
 
 [[d1_databases]]
 binding = "license-server" # available in your Worker on env.DB

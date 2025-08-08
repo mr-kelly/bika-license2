@@ -11,7 +11,7 @@ worker = { version = "0.6.1", features = ["d1"] }
 lib = { path = "../license-lib" }
 rsa = "0.9.6"
 getrandom = { version = "0.2", features = ["js"] }
-rand = { version = "0.9.2" }
+rand = { version = "0.8" }
 base64 = "0.22.1"
 serde = "1.0.204"
 log = "0.4"
