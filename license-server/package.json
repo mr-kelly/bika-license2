@@ -1,0 +1,12 @@
+{
+	"name": "template-worker-rust",
+	"version": "0.0.5",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev --env dev"
+	},
+	"devDependencies": {
+		"wrangler": "^4.28.1"
+	}
+}

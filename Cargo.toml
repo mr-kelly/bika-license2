@@ -1,6 +1,6 @@
 
 [package]
-authors = ["LongYinan <lynweklm@gmail.com>"]
+authors = ["Kelly Peilin Chan<kellypeilinchan@gmail.com>"]
 edition = "2021"
 name = "license"
 version = "0.1.0"
@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 napi = "3.0.0"
 napi-derive = "3.0.0"
+lib = { path = "./license-lib" }
 
 [build-dependencies]
 napi-build = "2"

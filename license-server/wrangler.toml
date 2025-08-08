@@ -1,0 +1,22 @@
+name = "license-server"
+main = "build/worker/shim.mjs"
+compatibility_date = "2023-12-01"
+
+routes = [
+  { pattern = "license.bika.ltd", custom_domain = true }
+]
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+[env.dev]
+build = { command = "cargo install -q worker-build && worker-build --dev" }
+
+[[d1_databases]]
+binding = "license-server" # available in your Worker on env.DB
+database_name = "license-server"
+database_id = "748593f3-6767-4b4c-941d-5867c4aefbc0"
+
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = true

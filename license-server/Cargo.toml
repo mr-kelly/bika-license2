@@ -1,0 +1,25 @@
+[package]
+name = "license-server"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+worker = { version = "0.6.1", features = ["d1"] }
+lib = { path = "../license-lib" }
+rsa = "0.9.6"
+getrandom = { version = "0.2", features = ["js"] }
+rand = { version = "0.9.2" }
+base64 = "0.22.1"
+serde = "1.0.204"
+log = "0.4"
+console_log = "1.0"
+
+
+[profile.release]
+opt-level = "s" # optimize for size in release builds
+lto = true
+strip = true
+codegen-units = 1

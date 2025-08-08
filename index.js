@@ -393,4 +393,5 @@ if (!nativeBinding) {
 }
 
 module.exports = nativeBinding
-module.exports.plus100 = nativeBinding.plus100
+module.exports.decrypt = nativeBinding.decrypt
+module.exports.sum = nativeBinding.sum
