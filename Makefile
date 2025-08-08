@@ -1,5 +1,5 @@
-dev:
-	cd license-server && npx wrangler dev --remote
+dev: # add --remote for local dev connect cloudflare d1 db
+	cd license-server && npx wrangler dev 
 
 test: test-rlib test-server test-nodelib
 	@echo 'All tests passed'
