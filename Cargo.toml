@@ -3,7 +3,7 @@
 authors = ["Kelly Peilin Chan<kellypeilinchan@gmail.com>"]
 edition = "2021"
 name = "license"
-version = "0.1.0"
+version = "1.0.0"
 
 [lib]
 crate-type = ["cdylib"]
