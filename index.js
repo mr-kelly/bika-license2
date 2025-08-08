@@ -78,7 +78,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-android-arm64')
+        return require('@bika.ai/license-android-arm64')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -89,7 +89,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-android-arm-eabi')
+        return require('@bika.ai/license-android-arm-eabi')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -104,7 +104,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-win32-x64-msvc')
+        return require('@bika.ai/license-win32-x64-msvc')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -115,7 +115,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-win32-ia32-msvc')
+        return require('@bika.ai/license-win32-ia32-msvc')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -126,7 +126,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-win32-arm64-msvc')
+        return require('@bika.ai/license-win32-arm64-msvc')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -140,7 +140,7 @@ function requireNative() {
       loadErrors.push(e)
     }
     try {
-      return require('license-darwin-universal')
+      return require('@bika.ai/license-darwin-universal')
     } catch (e) {
       loadErrors.push(e)
     }
@@ -151,7 +151,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-darwin-x64')
+        return require('@bika.ai/license-darwin-x64')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -162,7 +162,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-darwin-arm64')
+        return require('@bika.ai/license-darwin-arm64')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -177,7 +177,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-freebsd-x64')
+        return require('@bika.ai/license-freebsd-x64')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -188,7 +188,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-freebsd-arm64')
+        return require('@bika.ai/license-freebsd-arm64')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -204,7 +204,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-x64-musl')
+          return require('@bika.ai/license-linux-x64-musl')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -215,7 +215,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-x64-gnu')
+          return require('@bika.ai/license-linux-x64-gnu')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -228,7 +228,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-arm64-musl')
+          return require('@bika.ai/license-linux-arm64-musl')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -239,7 +239,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-arm64-gnu')
+          return require('@bika.ai/license-linux-arm64-gnu')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -252,7 +252,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-arm-musleabihf')
+          return require('@bika.ai/license-linux-arm-musleabihf')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -263,7 +263,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-arm-gnueabihf')
+          return require('@bika.ai/license-linux-arm-gnueabihf')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -276,7 +276,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-riscv64-musl')
+          return require('@bika.ai/license-linux-riscv64-musl')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -287,7 +287,7 @@ function requireNative() {
           loadErrors.push(e)
         }
         try {
-          return require('license-linux-riscv64-gnu')
+          return require('@bika.ai/license-linux-riscv64-gnu')
         } catch (e) {
           loadErrors.push(e)
         }
@@ -299,7 +299,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-linux-ppc64-gnu')
+        return require('@bika.ai/license-linux-ppc64-gnu')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -310,7 +310,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-linux-s390x-gnu')
+        return require('@bika.ai/license-linux-s390x-gnu')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -325,7 +325,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-linux-arm64-ohos')
+        return require('@bika.ai/license-linux-arm64-ohos')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -336,7 +336,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-linux-x64-ohos')
+        return require('@bika.ai/license-linux-x64-ohos')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -347,7 +347,7 @@ function requireNative() {
         loadErrors.push(e)
       }
       try {
-        return require('license-linux-arm-ohos')
+        return require('@bika.ai/license-linux-arm-ohos')
       } catch (e) {
         loadErrors.push(e)
       }
@@ -371,7 +371,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
   }
   if (!nativeBinding) {
     try {
-      nativeBinding = require('license-wasm32-wasi')
+      nativeBinding = require('@bika.ai/license-wasm32-wasi')
     } catch (err) {
       if (process.env.NAPI_RS_FORCE_WASI) {
         loadErrors.push(err)

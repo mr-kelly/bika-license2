@@ -13,6 +13,16 @@ pub fn decrypt(base64_message: &str) -> Result<String, String> {
         return Err("Input cannot be empty".to_string());
     }
     
+    // Check if this is chunked format (starts with "CHUNK:")
+    if base64_message.starts_with("CHUNK:") {
+        return decrypt_chunked(base64_message);
+    }
+    
+    // Original format - single RSA block
+    decrypt_single_block(base64_message)
+}
+
+fn decrypt_single_block(base64_message: &str) -> Result<String, String> {
     // Check if the base64 string is too long 
     // RSA-2048 produces 256-byte ciphertext, which is 344 chars in base64
     // We allow some extra margin for safety
@@ -45,6 +55,63 @@ pub fn decrypt(base64_message: &str) -> Result<String, String> {
             }
             Ok(text)
         },
+        Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
+    }
+}
+
+fn decrypt_chunked(base64_message: &str) -> Result<String, String> {
+    // Parse format: "CHUNK:count:block1|block2|..."
+    let parts: Vec<&str> = base64_message.splitn(3, ':').collect();
+    if parts.len() != 3 {
+        return Err("Invalid chunked format".to_string());
+    }
+    
+    if parts[0] != "CHUNK" {
+        return Err("Invalid chunked prefix".to_string());
+    }
+    
+    let chunk_count: usize = match parts[1].parse() {
+        Ok(count) => count,
+        Err(_) => return Err("Invalid chunk count".to_string()),
+    };
+    
+    if chunk_count == 0 || chunk_count > 100 { // Reasonable limit
+        return Err("Invalid chunk count".to_string());
+    }
+    
+    let blocks: Vec<&str> = parts[2].split('|').collect();
+    if blocks.len() != chunk_count {
+        return Err("Chunk count mismatch".to_string());
+    }
+    
+    let mut decrypted_parts = Vec::new();
+    let private_key = get_private_key();
+    
+    for block in blocks {
+        // Decode this block
+        let encrypted_data = match BASE64_STANDARD.decode(block) {
+            Ok(data) => data,
+            Err(_) => return Err("Invalid base64 in chunk".to_string()),
+        };
+        
+        if encrypted_data.len() != 256 {
+            return Err("Invalid chunk size".to_string());
+        }
+        
+        // Decrypt this block
+        let decrypted_block = match private_key.decrypt(Pkcs1v15Encrypt, &encrypted_data) {
+            Ok(data) => data,
+            Err(_) => return Err("Failed to decrypt chunk".to_string()),
+        };
+        
+        decrypted_parts.push(decrypted_block);
+    }
+    
+    // Combine all decrypted parts
+    let combined: Vec<u8> = decrypted_parts.into_iter().flatten().collect();
+    
+    match String::from_utf8(combined) {
+        Ok(text) => Ok(text),
         Err(_) => Err("Invalid UTF-8 in decrypted data".to_string()),
     }
 }

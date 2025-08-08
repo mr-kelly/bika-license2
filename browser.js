@@ -1,1 +1,1 @@
-export * from 'license-wasm32-wasi'
+export * from '@bika.ai/license-wasm32-wasi'

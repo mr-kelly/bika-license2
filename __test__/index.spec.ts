@@ -16,6 +16,13 @@ test('basic decrypt test', (t) => {
   t.is(decrypted, 'Hello, World!');
 })
 
+test('long decrpypt test', (t) => {
+  const longEncrypted = 'CHUNK:2:Vx21TCKRedMmbRgBHMVXGmnnXWAHuhX2s4SIA+cSf4Y2Ew3tTfwm+17JoNfCrBMVEocAfpTAswRK6BqI0gPKuXa5l7sXBwSWljdGVlDvQIV69tcbCMDRswKTIR9/aYmpRl3jdunwNdLYv07h8+Xj00tp0O3lCq9yowBPOU0oyKts0gnRdoz79Xl1r8j2ys7KAav2aRAoHgCmMZZqckgqcnwl+iySEiEJBsMBQULdsbeGLVbr7v8y2DUd9O36mVk34JZVlodjUjtJJwFFmW4tn7WzTNGF52kJNRrIzqGEpk56e8GaAnobeECTdgUxyt11LC5awWU5xmCK4qHlIvxDKQ==|2nzGY/bA1eXTsV8FEcU5b2za38ngwhGoUDVc08UjBDEB+hIxprBaFzcone8Z37quG+tifINFUDLymvjtAWWLU/guW0COobgR7Tbp+79cb12b5ZTMbZNo5x5mStotvP0hYcfNRG/arDhRMRYa1BQ4sQGdnHJ6YQ9cM+MduQEDM01cJtHUjUuyHljp2Zoy/Ywjjk7QGiT+u1HCQ7I08ZSntVxTpQj5IJKfei7zQzIe1Sd2POHIVzTL22Mp3tHPDD0Ls2UAaLgfMcbRDOOjzhe3iZaed6Qy36nBAzfknj5MR7XqJl9iU01hdUUQlcSZBxwLLmNiFU/qamaNtfFQ/wqeVQ==';
+  const decrypted = decrypt(longEncrypted);
+  let message = "a".repeat(246);
+  t.is(decrypted, message);
+});
+
 // 边界测试 - 字符串长度测试
 test('decrypt with various string lengths', (t) => {
   // 测试超长输入应该抛出错误

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use worker::*;
-use log::{info};
+// use log::{info};
 
 use lib::decrypt;
 
@@ -9,7 +9,9 @@ use crypto::encrypt;
 
 #[cfg(test)]
 mod tests;
-
+macro_rules! log {
+    ($($t:tt)*) => (web_sys::console::log_1(&format!($($t)*).into()))
+}
 // 数据库存档
 #[derive(Deserialize, Serialize)]
 struct LicenseCode {
@@ -72,15 +74,12 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     })
     // 只负责加密字符串，解密函数在客户端rust lib
     .post_async("/:key/encrypt", |mut req, ctx| async move {
-        console_log::init_with_level(log::Level::Info).expect("error initializing log");
-        println!("Hi!");
         let key = ctx.param("key").unwrap();
-        println!("Key: {}", key);
         if !check_access(key) {
           return Response::error("Access Denied", 403);
         }
         let body = req.json::<EncryptRequest>().await?;
-        info!("Start encrypt, {}", body.s);
+        log!("Start encrypt, {}", body.s);
         match encrypt(&body.s) {
           Ok(encrypted) => {
             Response::ok(encrypted)
